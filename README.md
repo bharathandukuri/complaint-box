@@ -1,44 +1,134 @@
 # RCE Complaint Box
 
-A modern, secure, full-stack grievance management and resolution tracking platform designed for educational institutions. Built with **Spring Boot 3.5**, **Java 25**, **MongoDB 7**, **React 19**, **Vite 7**, **Tailwind CSS 4**, and containerized with **Docker Compose**.
+> **A Modern, Full-Stack Grievance Management Platform Powered by a Dynamic Form Creation & Builder Engine**
+
+Built with **Spring Boot 3.5**, **Java 25**, **MongoDB 7**, **React 19**, **Vite 7**, **Tailwind CSS 4**, and containerized with **Docker Compose**.
 
 ---
 
-## Features & Roles
+## 🌟 Primary Feature: Dynamic Form Creation & Builder Engine
+
+The signature capability of **RCE Complaint Box** is its **Dynamic Form Creation & Rendering Engine**. Traditional grievance systems enforce rigid, hardcoded ticket fields that fail to capture the nuanced requirements of different institutional complaints (e.g., hostel room repairs require block and electrical/plumbing options, while lab grievances need equipment IDs and course codes).
+
+RCE Complaint Box resolves this through a complete, no-code, drag-and-drop form building and schema-driven rendering architecture:
+
+```
+┌───────────────────────────┐      ┌───────────────────────────┐      ┌───────────────────────────┐
+│     Admin Form Builder    │ ───> │      MongoDB Schema       │ ───> │    Dynamic Form Runtime   │
+│  • Drag-and-drop elements │      │  • JSON Field Definitions │      │  • Dynamic Zod Validation │
+│  • Visual field inspector │      │  • Portable & Versioned   │      │  • React Hook Form render │
+│  • Real-time canvas       │      │  • Stored per category    │      │  • File upload handling   │
+└───────────────────────────┘      └───────────────────────────┘      └───────────────────────────┘
+                                                                                    │
+                                                                                    ▼
+                                                                      ┌───────────────────────────┐
+                                                                      │ Schemaless Complaint Meta │
+                                                                      │  • Dynamic key-value map  │
+                                                                      │  • Rendered in Mentor/    │
+                                                                      │    Admin detail views     │
+                                                                      └───────────────────────────┘
+```
+
+### 1. Visual Drag-and-Drop Builder (`@dnd-kit`)
+- **Interactive Canvas**: Administrators can drag, drop, and rearrange form elements with live sorting handles and instant preview.
+- **Field Customizer**: Comprehensive property inspectors allow configuring labels, placeholders, input types, helper text, and required validation rules.
+- **Choice-Based Field Editor**: Add, remove, and sort custom options with key-value pairs for dropdowns and radio buttons.
+
+### 2. Supported Form Elements
+| Category | Element | Description |
+|---|---|---|
+| **Text Inputs** | `text-field` | Single-line input supporting text, email, number, tel, or URL formats |
+| **Multiline** | `text-area` | Resizable multiline text area for detailed problem descriptions |
+| **Numeric** | `number-field` | Quantifiable numeric values with min, max, and step boundaries |
+| **Dropdown** | `select-field` | Searchable / single-choice dropdown selection with custom options |
+| **Radio Group** | `radio-field` | Mutually exclusive radio options with horizontal row or column layout |
+| **Boolean** | `checkbox-field` | Single or multi-select confirmation and acknowledgment toggles |
+| **Date & Time** | `date-field`, `time-field`, `date-time-field` | Native calendar, clock, and combined timestamp pickers |
+| **Attachments** | `file-field` | Integrated file upload element (images, PDFs, documents) |
+| **Display / Layout** | `heading-view`, `paragraph-view`, `image-view` | Informational headers, instructions, guidelines, and reference diagrams |
+
+### 3. Dynamic Runtime Validation (Zod + React Hook Form)
+- When a student selects a complaint category, the frontend parses the stored JSON schema into dynamic form elements.
+- Form fields dynamically construct their own **Zod schema** at runtime (enforcing required constraints, regex masks, and value boundaries).
+- Dynamic error messages and real-time field validation are managed seamlessly through `react-hook-form` and `zodResolver`.
+
+### 4. Schemaless Persistence & Inspection
+- Dynamic answers are submitted and stored as an extensible key-value map (`Map<String, Object> meta`) in MongoDB without requiring schema migrations.
+- Mentors and administrators view grievances with their original dynamic field labels and custom formatting, including one-click previews for uploaded evidence.
+
+---
+
+## 🚀 Pre-Loaded Seed Data & Out-of-the-Box Setup
+
+A fresh instance starts with automatic, idempotent database seeding via `DataInitializer.java`. You can immediately log in and explore the platform without manual configuration.
+
+### Default Credentials
+
+| Role | Username | Password | Email | Details |
+|---|---|---|---|---|
+| **Admin** | `admin` | `admin123` | `admin@rce.ac.in` | Full institutional and system access |
+| **Mentor** | `mentor_cse` | `mentor123` | `mentor.cse@rce.ac.in` | Dr. Rajesh Kumar (`EMP101`), CSE Dept (Sections A & B) |
+| **Student** | `student_20rce001` | `student123` | `student001@rce.ac.in` | Arun Varma (`20RCE001`), CSE Dept, Section A (2024-2028) |
+
+### Pre-Configured Dynamic Complaint Forms
+1. **Hostel Maintenance Grievance**:
+   - `block` (Select: A-Block Boys, B-Block Boys, C-Block Boys, Girls Hostel Block 1)
+   - `roomNumber` (Text field, required)
+   - `category` (Radio: Electrical, Plumbing, Carpentry, Cleanliness)
+   - `description` (Textarea, required)
+   - `photoAttachment` (File upload, optional)
+2. **Academic & Lab Issues**:
+   - `courseCode` (Text field, e.g. `CS301 - Operating Systems`)
+   - `labRoom` (Text field, e.g. `Lab 3 / System 42`)
+   - `remarks` (Textarea, required)
+3. **Campus Facilities & Infrastructure**:
+   - `location` (Text field, e.g. `Central Library 2nd Floor`)
+   - `facilityType` (Select: Library, Canteen, Sports, Wi-Fi, Restrooms)
+   - `details` (Textarea, required)
+
+### Pre-Configured Academic Departments & Sections
+- **CSE** (Computer Science & Engineering) - Sections A, B, C
+- **ECE** (Electronics & Communication Engineering) - Sections A, B
+- **MECH** (Mechanical Engineering) - Section A
+- **CIVIL** (Civil Engineering) - Section A
+
+---
+
+## 👥 Role-Based Access Control
 
 ### 🎓 Student
-- **Raise Complaints**: File complaints under custom categories (Hostel, Academics, Infrastructure, etc.) with dynamic forms and file attachments (images, PDFs, documents).
-- **Anonymous Mode**: Option to file grievances without revealing identity.
-- **Real-Time Tracking**: Track status changes (`PENDING`, `IN_PROGRESS`, `RESOLVED`, `REJECTED`, `ESCALATED`) along with mentor/admin action remarks.
-- **Personal Dashboard**: View summary counters (total, resolved, pending) and recent activity.
+- **Dynamic Grievance Submission**: Choose grievance category and fill dynamic schema-driven forms with file attachments.
+- **Anonymous Filing**: Option to lodge complaints anonymously while retaining resolution updates.
+- **Real-Time Tracking**: Track status lifecycle (`PENDING` ➔ `IN_PROGRESS` ➔ `RESOLVED` / `REJECTED` / `ESCALATED`) and view mentor action logs.
+- **Student Dashboard**: Counter metrics for total, pending, and resolved complaints.
 
 ### 👨‍🏫 Mentor
-- **Department & Section Scopes**: Mentors are assigned to specific departments and sections by administrators.
-- **Complaint Actioning**: Update complaint status and attach resolution remarks (`RESOLVED`, `IN_PROGRESS`, `ESCALATED`, `REJECTED`).
-- **Scoped Oversight**: Mentors can only view and resolve complaints within their assigned department/section scope.
+- **Department & Section Scopes**: Mentors can only access and action complaints from their assigned departments and sections.
+- **Resolution Tracking**: Update complaint statuses with remarks and resolution descriptions.
+- **Multi-Scope Allocations**: Mentors can be allocated to multiple sections across departments.
 
 ### 🛡️ Administrator
-- **User Management**: Create, update, and manage accounts for Students, Mentors, and Admins.
-- **Department & Section Management**: Create and configure academic departments and sections with automatic cascade handling.
-- **Mentor Assignment**: Dynamically allocate mentors to multiple departments and sections.
-- **Custom Complaint Types**: Configure grievance categories with custom form schemas and field specifications.
-- **Analytics & Global Oversight**: Search, filter, and inspect grievances institution-wide.
+- **Dynamic Form Studio**: Create, edit, and publish dynamic complaint forms with the drag-and-drop builder.
+- **User Management**: Provision, modify, and ban accounts for Students, Mentors, and Admins.
+- **Department Hierarchy**: Manage departments and sections with cascading safety checks.
+- **Mentor Allocations**: Assign or revoke mentor departmental oversight.
+- **Global Oversight**: Institution-wide grievance monitoring and search filters.
 
 ---
 
-## Tech Stack
+## 💻 Tech Stack
 
 | Layer | Technologies |
 |---|---|
-| **Backend** | Spring Boot 3.5.9, Java 25, Spring Data MongoDB, Spring Security 6 (JWT stateless auth), Bean Validation (`jakarta.validation`), Lombok |
-| **Frontend** | React 19, TypeScript 5.8, Vite 7, Tailwind CSS v4, Radix UI / shadcn/ui, TanStack Query v5, React Router v7, Lucide Icons, Sonner |
+| **Backend** | Spring Boot 3.5.9, Java 25, Spring Data MongoDB, Spring Security 6 (Stateless JWT), Bean Validation (`jakarta.validation`), Lombok |
+| **Frontend** | React 19, TypeScript 5.8, Vite 7, Tailwind CSS v4, Radix UI / shadcn/ui, TanStack Query v5, React Router v7, `@dnd-kit`, Zod, Lucide Icons, Sonner |
 | **Database & Files** | MongoDB 7.0, Local disk volume storage with MIME-type streaming |
 | **DevOps & Containers** | Docker, Docker Compose, Multi-stage builds (Eclipse Temurin JRE 25 + Nginx Alpine SPA server) |
-| **Testing** | JUnit 5, Mockito, Testcontainers (MongoDB 7.0), 100 comprehensive unit & integration tests |
+| **Testing** | JUnit 5, Mockito, Testcontainers (MongoDB 7.0), 100 comprehensive automated unit & integration tests |
 
 ---
 
-## Quick Start with Docker Compose
+## ⚡ Quick Start with Docker Compose
 
 ### Prerequisites
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (running with WSL2 or Hyper-V backend)
@@ -52,7 +142,7 @@ cd rce-complaint-box
 cp .env.example .env
 ```
 
-Review `.env` and adjust secrets/ports if desired:
+Review `.env` and adjust secrets/ports if needed:
 ```env
 MONGODB_URI=mongodb://mongo:27017/complaint_box
 JWT_SECRET=ZEdlZTJnSlRHLUtDLi5xQUx7MFR5S3RNZk03JSt4enJkLF8mZUp4WntmJTJGYWVQNmo=
@@ -67,10 +157,10 @@ VITE_BACKEND_URL=http://localhost:8080
 docker compose up -d --build
 ```
 
-The stack will start and run health checks:
+The stack will start and perform container health checks:
 - **Frontend**: [http://localhost:3000](http://localhost:3000)
 - **Backend API**: [http://localhost:8080](http://localhost:8080)
-- **Backend Healthcheck**: [http://localhost:8080/test](http://localhost:8080/test)
+- **Backend Health Check**: [http://localhost:8080/test](http://localhost:8080/test)
 - **MongoDB**: `localhost:27017`
 
 ### 3. Stop Services
@@ -80,11 +170,10 @@ docker compose down
 
 ---
 
-## Local Development (Without Docker)
+## 🛠️ Local Development (Without Docker)
 
 ### Backend
-
-**Prerequisites**: JDK 25 (e.g. Eclipse Temurin or Microsoft OpenJDK 25), MongoDB running locally on `localhost:27017`.
+**Prerequisites**: JDK 25 (e.g. Eclipse Temurin or Microsoft OpenJDK 25), MongoDB running on `localhost:27017`.
 
 ```bash
 cd backend
@@ -100,7 +189,6 @@ $env:PATH = "$env:JAVA_HOME\bin;$env:PATH"
 The backend starts on `http://localhost:8080`.
 
 ### Frontend
-
 **Prerequisites**: Node.js 20+ (recommended Node 22+).
 
 ```bash
@@ -109,7 +197,7 @@ cd frontend
 # Install dependencies
 npm install
 
-# Start Vite development server
+# Start Vite dev server
 npm run dev
 ```
 
@@ -117,7 +205,7 @@ The frontend development server starts on `http://localhost:5173`.
 
 ---
 
-## Testing
+## 🧪 Automated Testing
 
 The project includes an exhaustive test suite of **100 automated tests** covering all failure modes, boundary validations, conflict scenarios, role authorization guards, and database criteria queries.
 
@@ -147,7 +235,7 @@ cd backend
 
 ---
 
-## API Overview
+## 📡 API Overview
 
 All API responses follow a standardized envelope:
 ```json
@@ -171,10 +259,11 @@ All API responses follow a standardized envelope:
 | `DELETE` | `/users/{id}` | Admin | Delete a user account |
 | `POST` | `/users/mentor/assign` | Admin | Assign a mentor to a department and section |
 | `DELETE` | `/users/mentor/assign` | Admin | Remove mentor assignment |
-| `POST` | `/departments` | Admin | Create department with sections |
-| `PUT` | `/departments/{code}` | Admin | Update department name and sections (with cascade delete) |
-| `DELETE` | `/departments/{code}` | Admin | Delete department (with cascade delete) |
-| `POST` | `/complaints` | Student | File a new complaint (supports anonymous option) |
+| `GET` | `/complaint-types` | Authenticated | Retrieve all complaint types with form schemas |
+| `POST` | `/complaint-types` | Admin | Create complaint category with dynamic form schema |
+| `PUT` | `/complaint-types/{id}` | Admin | Update dynamic form schema for category |
+| `DELETE` | `/complaint-types/{id}` | Admin | Delete complaint category |
+| `POST` | `/complaints` | Student | File a new complaint with dynamic `meta` payload |
 | `GET` | `/complaints/me` | Student | Get complaints raised by the logged-in student |
 | `GET` | `/complaints` | Mentor / Admin | Query complaints with role-scoped filters |
 | `DELETE` | `/complaints/{id}` | Owner / Admin / Mentor | Delete complaint |
@@ -184,5 +273,5 @@ All API responses follow a standardized envelope:
 
 ---
 
-## License
+## 📄 License
 MIT
