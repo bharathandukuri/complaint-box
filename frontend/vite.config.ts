@@ -5,13 +5,30 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
-    resolve: {
-        alias: {
-            "@": path.resolve(__dirname, "./src"),
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom", "react-router-dom"],
+          query: ["@tanstack/react-query"],
+          ui: [
+            "lucide-react",
+            "sonner",
+            "class-variance-authority",
+            "clsx",
+            "tailwind-merge",
+          ],
         },
+      },
     },
-    server: {
-        allowedHosts: ["0.tcp.in.ngrok.io"],
-    },
+  },
+  server: {
+    host: true,
+  },
 });
