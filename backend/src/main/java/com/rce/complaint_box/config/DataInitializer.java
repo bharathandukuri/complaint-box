@@ -118,12 +118,6 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void seedComplaintTypes() {
-        if (complaintTypeRepository.count() > 0) {
-            return;
-        }
-
-        log.info("Seeding initial dynamic complaint types (forms)...");
-
         // Dynamic Form 1: Hostel Maintenance
         String hostelFormJson = """
                 [
@@ -159,6 +153,7 @@ public class DataInitializer implements CommandLineRunner {
                     "name": "category",
                     "label": "Issue Category",
                     "layout": "row",
+                    "defaultValue": "ELECTRICAL",
                     "required": true,
                     "options": [
                       {"label": "Electrical", "value": "ELECTRICAL"},
@@ -171,17 +166,20 @@ public class DataInitializer implements CommandLineRunner {
                     "id": "f_desc",
                     "elementType": "field",
                     "fieldType": "text-area",
-                    "name": "description",
-                    "label": "Detailed Problem Description",
-                    "placeholder": "Please describe the problem in detail...",
+                    "name": "issueDetails",
+                    "label": "Specific Issue Details",
+                    "placeholder": "Please describe the maintenance issue in detail...",
                     "required": true
                   },
                   {
                     "id": "f_photo",
                     "elementType": "field",
-                    "fieldType": "file-field",
+                    "fieldType": "file-input-field",
                     "name": "photoAttachment",
                     "label": "Photo / Evidence (optional)",
+                    "placeholder": "Upload photo or evidence",
+                    "accept": "image",
+                    "multiple": false,
                     "required": false
                   }
                 ]
@@ -215,7 +213,7 @@ public class DataInitializer implements CommandLineRunner {
                     "elementType": "field",
                     "fieldType": "text-area",
                     "name": "remarks",
-                    "label": "Grievance Description",
+                    "label": "Grievance Remarks",
                     "placeholder": "Explain the academic or lab issue...",
                     "required": true
                   }
@@ -263,17 +261,30 @@ public class DataInitializer implements CommandLineRunner {
                 ]
                 """.trim();
 
-        ComplaintType hostel = new ComplaintType(1L, "Hostel Maintenance",
-                "Hostel electrical, plumbing, sanitation, and room repair complaints", hostelFormJson, new Date(), new Date());
+        if (complaintTypeRepository.count() == 0) {
+            log.info("Seeding initial dynamic complaint types (forms)...");
+            ComplaintType hostel = new ComplaintType(1L, "Hostel Maintenance",
+                    "Hostel electrical, plumbing, sanitation, and room repair complaints", hostelFormJson, new Date(), new Date());
 
-        ComplaintType academic = new ComplaintType(2L, "Academic & Lab Issues",
-                "Curriculum, lecture halls, computer laboratories, and experimental apparatus issues", academicFormJson, new Date(), new Date());
+            ComplaintType academic = new ComplaintType(2L, "Academic & Lab Issues",
+                    "Curriculum, lecture halls, computer laboratories, and experimental apparatus issues", academicFormJson, new Date(), new Date());
 
-        ComplaintType campus = new ComplaintType(3L, "Campus Facilities & Infrastructure",
-                "General campus amenities including library, Wi-Fi, canteen, and sports facilities", campusFormJson, new Date(), new Date());
+            ComplaintType campus = new ComplaintType(3L, "Campus Facilities & Infrastructure",
+                    "General campus amenities including library, Wi-Fi, canteen, and sports facilities", campusFormJson, new Date(), new Date());
 
-        complaintTypeRepository.saveAll(List.of(hostel, academic, campus));
-        sequenceGenerator.setSequence(ComplaintType.sequenceName, 3);
-        log.info("Dynamic complaint types (forms) seeded successfully.");
+            complaintTypeRepository.saveAll(List.of(hostel, academic, campus));
+            sequenceGenerator.setSequence(ComplaintType.sequenceName, 3);
+            log.info("Dynamic complaint types (forms) seeded successfully.");
+        } else {
+            // Self-healing migration for existing database seed data
+            ComplaintType existingHostel = complaintTypeRepository.findByTitle("Hostel Maintenance");
+            if (existingHostel != null && existingHostel.getFields() != null &&
+                    (existingHostel.getFields().contains("\"file-field\"") || existingHostel.getFields().contains("\"name\": \"description\""))) {
+                existingHostel.setFields(hostelFormJson);
+                existingHostel.setUpdatedAt(new Date());
+                complaintTypeRepository.save(existingHostel);
+                log.info("Migrated existing Hostel Maintenance schema to corrected JSON definition.");
+            }
+        }
     }
 }
