@@ -1,0 +1,29 @@
+{
+    "properties": [
+        {
+            "name": "frontend-url",
+            "type": "java.lang.String",
+            "description": "URL for the frontend"
+        },
+        {
+            "name": "jwt-secret",
+            "type": "java.lang.String",
+            "description": "Secret key for generating JWT token"
+        },
+        {
+            "name": "jwt-expiry",
+            "type": "java.lang.Long",
+            "description": "Expiry time for the JWT Token"
+        },
+        {
+            "name": "file-storage-directory",
+            "type": "java.lang.String",
+            "description": "Root directory where the files are stored."
+        },
+        {
+            "name": "backend-url",
+            "type": "java.lang.String",
+            "description": "URL for backend"
+        }
+    ]
+}

@@ -1,0 +1,16 @@
+﻿# Maven build output
+target/
+
+# IDE / editor metadata
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# Local uploads (mounted as Docker volume; use the files/ dir at project root)
+uploads/
+
+# OS junk
+.DS_Store
+Thumbs.db

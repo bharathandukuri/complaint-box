@@ -1,0 +1,77 @@
+services:
+  # -- MongoDB ------------------------------------------------------------------
+  mongo:
+    image: mongo:7
+    container_name: rce-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - rce-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # -- Spring Boot Backend ------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rce-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRY=${JWT_EXPIRY}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - BACKEND_URL=${BACKEND_URL}
+      - FILE_STORAGE_DIR=/app/files
+    volumes:
+      - files_data:/app/files
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - rce-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/test || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # -- React Frontend -----------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL}
+    container_name: rce-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - rce-network
+
+# -- Volumes -------------------------------------------------------------------
+volumes:
+  mongo_data:
+    driver: local
+  files_data:
+    driver: local
+
+# -- Networks ------------------------------------------------------------------
+networks:
+  rce-network:
+    driver: bridge

@@ -1,0 +1,13 @@
+﻿# Node modules (reinstalled in Docker build)
+node_modules/
+
+# Vite build output (rebuilt in Docker build)
+dist/
+
+# IDE / editor metadata
+.idea/
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db

@@ -1,0 +1,25 @@
+# Uploaded files & volumes
+files/
+files_data/
+mongo_data/
+
+# Environment files (never commit secrets)
+.env
+.env.local
+*.env
+
+# Build outputs
+**/target/
+**/node_modules/
+**/dist/
+
+# Logs
+*.log
+logs/
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
